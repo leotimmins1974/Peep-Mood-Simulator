@@ -8,6 +8,10 @@
 
     A plane, should be grey. simple 4 points, 2 faces
 
+##  church.obj
+
+    A cross for religion factor
+
 ## peep.obj
 
     little humanoid thing. lots of points. should be colored based on 'contentness'

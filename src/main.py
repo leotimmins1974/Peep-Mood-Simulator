@@ -21,22 +21,39 @@ def main() -> exit_code:
     # Grab configs
     configuration = config.parse_config(SIMULATION_CONFIG_PATH)
 
-    # TEST CUBE
-    cube_mesh = obj.load(MESHES_FOLDER_PATH + "cube.obj")
-    cube_mesh.transform.translate[0] = -3
+    # Load assets
+    floor_mesh = obj.load(MESHES_FOLDER_PATH + "floor.obj")
+    floor_mesh.transform.scale = [4.,4.,4.]
+    floor_mesh.transform.translate = [0.,-1.,0.]
+    floor_mesh.transform.update_model()
 
-    cam_light = graphics.Light(np.array([-1.,0.,0.]), np.array([0.,0.,0.]), 0.3)
+    church = obj.load(MESHES_FOLDER_PATH + "church.obj")
+    church.color = (242,245,66) # Yellow
+    church.transform.translate = [-6,1,7]
+    church.transform.rotate = (0,1,0)
+    church.transform.update_model()
 
     camera = graphics.Camera()
+    camera.transform.translate = np.array([14.,6.,0.])
+    camera.look_at(np.array([0.,0.,0.]))
+    camera.fov = 1.1
+    camera.update_projection()
 
-    render_order = [cube_mesh]
-    light_order = [cam_light]
+    cam_light = graphics.Light(np.array([-1.,0.,0.]), np.array([0.,0.,0.]), 0.3)
+    top_light = graphics.Light(np.array([0.,-1.,0.]), np.array([0.,5.,0.]), 0.1)
+
+    test_peep = obj.load(MESHES_FOLDER_PATH + "peep.obj")
+    test_peep.color = (255,0,0)
+
+    render_order = [test_peep,church ,floor_mesh]
+    light_order = [cam_light, top_light]
 
     # Window/Buffer manager 
     pygame.init()
     pygame.display.set_caption("3D Peep Simulation")
 
     window = pygame.display.set_mode((graphics.WIDTH, graphics.HEIGHT))
+    clock = pygame.time.Clock()
 
     close = False
     while not close:
@@ -47,15 +64,12 @@ def main() -> exit_code:
 
         window.fill(BACKGROUND_RGB)
         # SIM LOGIC
-        cube_mesh.transform.rotate[0] += 0.01
-        cube_mesh.transform.rotate[1] += 0.01
-        cube_mesh.transform.rotate[2] += 0.01
-        cube_mesh.transform.update_model()
-        #cube_mesh.transform.translate[0] -= 1
         
         # Draw Faces
         view_proj = camera.projection @ camera.view
+        triangles_to_draw = []
         for mesh in render_order:
+            view_model = camera.view @ mesh.transform.model
             view_proj_model = view_proj @ mesh.transform.model
             for face in mesh.faces:
                 if len(face.indicies) !=3 :
@@ -93,13 +107,18 @@ def main() -> exit_code:
                     total_intensity += max(0, np.dot(normal, -light_dir)) * light.lumens
 
                 # Draw polygons
+                v_view = (
+                    view_model @ np.append(v[0].pos, 1.0),
+                    view_model @ np.append(v[1].pos, 1.0),
+                    view_model @ np.append(v[2].pos, 1.0),
+                )
                 v = (
                     view_proj_model @ np.append(v[0].pos, 1.0),
                     view_proj_model @ np.append(v[1].pos, 1.0),
                     view_proj_model @ np.append(v[2].pos, 1.0),
                 )
-                #if v[0][3] < 0 or v[1][3] < 0 or v[2][3] < 0:
-                #    continue
+                if any(vertex[3] <= 0 for vertex in v):
+                    continue
 
                 p = (
                     graphics.to_screen_space(v[0], camera.resolution[0], camera.resolution[1]),
@@ -108,7 +127,13 @@ def main() -> exit_code:
                 )
                 shaded_color = np.array(mesh.color[:3], dtype=float) * total_intensity
                 shaded_color = np.clip(shaded_color, 0, 255).astype(int)
-                pygame.draw.polygon(window, shaded_color, p)
+
+                depth = (v_view[0][2] + v_view[1][2] + v_view[2][2]) / 3.0
+                triangles_to_draw.append((depth, shaded_color, p))
+
+        triangles_to_draw.sort(key=lambda triangle: triangle[0])
+        for _, shaded_color, p in triangles_to_draw:
+            pygame.draw.polygon(window, shaded_color, p)
 
         # Draw Points
         #for mesh in render_order:
@@ -117,7 +142,7 @@ def main() -> exit_code:
         #        if clip_coordinates[3] != 0:
         #            window.set_at(graphics.to_screen_space(clip_coordinates, camera.resolution[0], camera.resolution[1]), (255,255,255))
 
-        pygame.time.delay(TARGET_FPS)
+        clock.tick(TARGET_FPS)
         pygame.display.update()
 
     pygame.quit()

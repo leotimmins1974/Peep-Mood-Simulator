@@ -98,6 +98,28 @@ class Camera:
             [0.,0.,0.,1.]
         ])
 
+    def look_at(self, target):
+        position = np.array(self.transform.translate, dtype=float)
+        target = np.array(target, dtype=float)
+        world_up = np.array([0., 1., 0.])
+
+        forward = target - position
+        forward /= np.linalg.norm(forward)
+
+        right = np.cross(forward, world_up)
+        if np.linalg.norm(right) == 0:
+            world_up = np.array([0., 0., 1.])
+            right = np.cross(forward, world_up)
+        right /= np.linalg.norm(right)
+
+        up = np.cross(right, forward)
+        up /= np.linalg.norm(up)
+
+        self.forward = -forward
+        self.right = right
+        self.up = up
+        self.update_view()
+
 class Light:
     def __init__(self, direction, position, lumens):
         self.direction = direction
