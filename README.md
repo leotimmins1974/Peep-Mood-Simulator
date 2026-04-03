@@ -17,6 +17,14 @@
     
     With the complexity of this program you may suspect AI usage. None was used. I have tracked my codebase with git so you can review the commits as proof if nessesary.
 
+### Dependancys
+
+    please run 
+
+    ``` bash
+    python3 -m pip install -r requirements.txt
+    ```
+
 ### Scope
 
     You'll Have to forgive the preformance of this program. Python, am I right? 
@@ -37,6 +45,6 @@
 
 ### Refrences
 
-    - three-dimensional-rendering by Leo Timmins https://github.com/leotimmins1974/three-dimensional-rendering
+    - (Code I have written!) three-dimensional-rendering by Leo Timmins https://github.com/leotimmins1974/three-dimensional-rendering 
     
     - Transformation Matrix for Projection of 3d objects into a 2D plane (Projection Transform) https://www.mauriciopoppe.com/notes/computer-graphics/viewing/projection-transform/

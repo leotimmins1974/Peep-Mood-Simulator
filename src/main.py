@@ -13,6 +13,9 @@ SIMULATION_CONFIG_PATH = "./simulation.config"
 # Grab configs
 config = config.parse_config(SIMULATION_CONFIG_PATH)
 
+# TEST CUBE
+cube_mesh = obj.load(MESHES_FOLDER_PATH + "cube.obj")
+
 # ENTRY POINT
 def main() -> exit_code:
 
