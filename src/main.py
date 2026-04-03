@@ -10,6 +10,8 @@ import tools.results as results
 MESHES_FOLDER_PATH = "./meshes/"
 SIMULATION_CONFIG_PATH = "./simulation.config"
 
+# Grab configs
+config = config.parse_config(SIMULATION_CONFIG_PATH)
 
 # ENTRY POINT
 def main() -> exit_code:
