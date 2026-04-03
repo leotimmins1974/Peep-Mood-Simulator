@@ -1,0 +1,1 @@
+# MANAGER FOR .obj FILES
