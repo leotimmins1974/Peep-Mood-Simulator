@@ -33,6 +33,13 @@ def main() -> exit_code:
     church.transform.rotate = (0,1,0)
     church.transform.update_model()
 
+    kfc = obj.load(MESHES_FOLDER_PATH + "kfc.obj")
+    kfc.color = (242,50,66) # Red for KFC
+    kfc.transform.translate = [5,3.5,6]
+    kfc.transform.scale = [3.,3.,3.]
+    kfc.transform.rotate = (0,4.7,0)
+    kfc.transform.update_model()
+
     camera = graphics.Camera()
     camera.transform.translate = np.array([14.,6.,0.])
     camera.look_at(np.array([0.,0.,0.]))
@@ -45,7 +52,7 @@ def main() -> exit_code:
     test_peep = obj.load(MESHES_FOLDER_PATH + "peep.obj")
     test_peep.color = (255,0,0)
 
-    render_order = [test_peep,church ,floor_mesh]
+    render_order = [test_peep,church ,floor_mesh,kfc]
     light_order = [cam_light, top_light]
 
     # Window/Buffer manager 

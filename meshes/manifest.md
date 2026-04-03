@@ -12,6 +12,10 @@
 
     A cross for religion factor
 
+##  kfc.obk
+
+    A kfc for hunger
+
 ## peep.obj
 
     little humanoid thing. lots of points. should be colored based on 'contentness'
