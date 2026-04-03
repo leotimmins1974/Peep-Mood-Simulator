@@ -1,5 +1,7 @@
 # MANAGER FOR .obj FILES
 
+import numpy as np
+
 import render.graphics as graphics
 
 def load(path) -> graphics.Mesh:
@@ -19,7 +21,7 @@ def load(path) -> graphics.Mesh:
                 pos = []
                 for p in k[1].split(" "):
                     pos.append(float(p))
-                verticies.append(graphics.Vertex(pos))
+                verticies.append(graphics.Vertex(np.array(pos)))
             
             case 'vt':
                 pass # Maybe ill add UV textures at some point
@@ -30,7 +32,7 @@ def load(path) -> graphics.Mesh:
             case 'f':
                 indicies = []
                 for i in k[1].split(" "):
-                    indicies.append(int(i.split('/',1)[0]))
+                    indicies.append(int(i.split('/',1)[0])-1) # -1 to convert to 0 index
                 faces.append(graphics.Face(indicies))
 
     print("done!")

@@ -64,7 +64,7 @@ class Face:
         self.indicies = indicies
 
 class Vertex:
-    def __init__(self, pos: [float, float, float]):
+    def __init__(self, pos):
         self.pos = pos
 
 class Camera:
@@ -97,6 +97,12 @@ class Camera:
             [self.forward[0], self.forward[1], self.forward[2], -np.dot(self.forward, self.transform.translate)],
             [0.,0.,0.,1.]
         ])
+
+class Light:
+    def __init__(self, direction, position, lumens):
+        self.direction = direction
+        self.position = position
+        self.lumens = lumens
 
 def to_screen_space(clip_coord, width, height):
     return((int(round((clip_coord[0]/clip_coord[3]+1) / 2. * width,0)), int(round((1.-clip_coord[1] / clip_coord[3])/2.*height,0)) ))
