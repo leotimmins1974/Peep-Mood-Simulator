@@ -9,9 +9,11 @@
 
     - To configure simulation go to /simulation.config
 
-    - To view results go to /results.md (after running succesfully)
+    - Be careful when modifying the config, read the comments
 
-    - If main() returns exit code !0 goto exit_report.txt
+    - To view results go to /results.md (after running (AND FINISHING) succesfully)
+
+    - If main() returns exit code !0 goto exit_report.txt // Not actualy implemented yet
 
 ### Note
     

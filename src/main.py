@@ -1,9 +1,26 @@
+#
+# Student Name: Leo Timmins
+# Student ID  : 23559213
+#
+# main.py - simulation of emotions as peeple moev through a world
+#         - entry point for project
+#
+# Version information:
+#    - 2026-03-30 - inital version supplied
+#    - CHECK GIT HISTORY FOR VERSIONS 
+#
+# Usage: 
+#   run "venv venv"
+#   run "venv/bin/activate" on arch. might be differnent on ubuntu
+#   run "pip install -r requirements.txt"
+#   run "python3 src/main.py"   
+
 import pygame
 import numpy as np
+import math as math
 
 import assets.obj as obj
 
-import render.math as math
 import render.graphics as graphics
 
 import tools.config as config
@@ -16,6 +33,10 @@ SIMULATION_CONFIG_PATH = "./simulation.config"
 configuration = config.parse_config(SIMULATION_CONFIG_PATH)
 
 # Apply config
+CAMERA_ROTATION_SPEED = float(configuration['camera_rotation_speed'])
+CAMERA_XZ_DISTANCE = float(configuration['camera_xz_distance'])
+CAMERA_Y_DISTANCE = float(configuration['camera_y_distance'])
+CAMERA_FOV = float(configuration['camera_fov'])
 MESHES_FOLDER_PATH = configuration['meshes_folder_path']
 TARGET_FPS = int(configuration['target_fps'])
 THREAD_USAGE = int(configuration['thread_usage'])
@@ -42,21 +63,22 @@ def main() -> exit_code:
 
     church = obj.load(MESHES_FOLDER_PATH + "church.obj")
     church.color = (242,245,66) # Yellow
-    church.transform.translate = [-6,1,-7]
+    church.transform.translate = [-6,0,-7]
     church.transform.rotate = (0,-1,0)
     church.transform.update_model()
 
     kfc = obj.load(MESHES_FOLDER_PATH + "kfc.obj")
     kfc.color = (242,50,66) # Red for KFC
-    kfc.transform.translate = [5.2,3.5,6]
+    kfc.transform.translate = [5.2,2.5,6]
     kfc.transform.scale = [3.,3.,3.]
     kfc.transform.rotate = (0,4.7,0)
     kfc.transform.update_model()
 
+    camera_rotation = 0
     camera = graphics.Camera()
-    camera.transform.translate = np.array([14.,6.,0.])
-    camera.look_at(np.array([0.,0.,0.]))
-    camera.fov = 1.1
+    camera.transform.translate = np.array([CAMERA_XZ_DISTANCE*math.cos(camera_rotation),CAMERA_Y_DISTANCE,CAMERA_XZ_DISTANCE*math.sin(camera_rotation)])
+    camera.look_at(np.array([0.,0.,0.])) # Looks at orgin no matter the translation
+    camera.fov = CAMERA_FOV
     camera.update_projection()
 
     cam_light = graphics.Light(np.array([-1.,0.,0.]), np.array([0.,0.,0.]), 0.3)
@@ -66,11 +88,11 @@ def main() -> exit_code:
     test_peep_manager = sim.Peep(test_peep) # Not sure how refrences work in python, im assuming this passes ref and not val?
     test_peep.color = (255,0,0)
     test_peep_manager.move_speed = PEEP_MOVE_SPEED
-    test_peep_manager.move_to((5,0,0))
-    test_peep_manager.move_to((0,0,-8))
-    test_peep_manager.move_to((3,0,-8))
-    test_peep_manager.move_to((5,0,-5))
-    test_peep_manager.move_to((3,0,8))
+    test_peep_manager.move_to((5,-0.5,0))
+    test_peep_manager.move_to((0,-0.5,-8))
+    test_peep_manager.move_to((3,-0.5,-8))
+    test_peep_manager.move_to((5,-0.5,-5))
+    test_peep_manager.move_to((3,-0.5,8))
 
     render_order = [test_peep,church ,floor_mesh,kfc]
     light_order = [cam_light, top_light]
@@ -85,12 +107,11 @@ def main() -> exit_code:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 close = True
-
+        # Buffer setup
         window.fill(BACKGROUND_RGB)
         render_text("fps: " + str(int(clock.get_fps())), (255,255,255), (5,5), size=18) # FPS counter
         render_text(f"| Peep Mood Simulator | Leo Timmins | Student ID: 2559213 | COMP1005 | Simulation is in progress", (255,255,255), (70,5), size=18) # Sim title
         render_text(f"Engine Info | target_fps: {TARGET_FPS} | tickrate: {TICKRATE} ms | threads: {THREAD_USAGE} | RenObj: {len(render_order)} | Lights: {len(light_order)} | ", (255,255,255), (5,32), size=13) # Sim title
-        
         # TICK LOGIC
         ## ticks ever TICKRATE (ms) and doesnt tick on start
         if pygame.time.get_ticks() >= next_tick:
@@ -99,7 +120,16 @@ def main() -> exit_code:
                 p.tick()
             next_tick = pygame.time.get_ticks() + TICKRATE
 
+            # camera move
+            camera_rotation += CAMERA_ROTATION_SPEED
+            camera.transform.translate = np.array([CAMERA_XZ_DISTANCE*math.cos(camera_rotation),CAMERA_Y_DISTANCE,CAMERA_XZ_DISTANCE*math.sin(camera_rotation)])
+            camera.look_at([0,0,0])
+            camera.update_view()
+
         # SIM LOGIC
+
+        test_peep.transform.rotate[1] += 0.0001
+        test_peep.transform.update_model()
 
         # Draw Faces
         view_proj = camera.projection @ camera.view
@@ -112,10 +142,6 @@ def main() -> exit_code:
                     print("IRREGULAR FACE (SKIP, NO PANIC)")
                     print(face.indicies)
                     continue
-
-
-                test_peep.transform.rotate[1] += 0.0001
-                test_peep.transform.update_model()
 
                 # Get relevent Vertex
                 v = (mesh.verticies[face.indicies[0]], mesh.verticies[face.indicies[1]], mesh.verticies[face.indicies[2]])
