@@ -40,8 +40,8 @@ def load(path) -> graphics.Mesh:
                 face = []
                 for i in k[1].split():
                     parts = i.split("/")
-                    vertex_index = int(parts[0]) -1
-                    normal_index = int(parts[2]) -1
+                    vertex_index = int(parts[0]) - 1
+                    normal_index = int(parts[2]) - 1
                     face.append((vertex_index, normal_index))
 
                 for tri_index in range(1, len(face) - 1):

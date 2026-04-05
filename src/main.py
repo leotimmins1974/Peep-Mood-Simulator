@@ -17,19 +17,15 @@
 
 from pathlib import Path
 import math
-
 import moderngl
 import numpy as np
 import pygame
 
-import assets.obj as obj
-
-import render.graphics as graphics
-
-import tools.config as config
-import tools.results as results
-
-import simulation.simulation as sim
+import obj
+import graphics
+import config
+import results
+import simulation as sim
 
 # Grab configs
 SIMULATION_CONFIG_PATH = (
@@ -50,7 +46,6 @@ BACKGROUND_RGB = (int(B_RRGGBB[0:3]), int(B_RRGGBB[4:6]), int(B_RRGGBB[7:]))
 BACKGROUND_CLEAR = tuple(
     channel / 255.0 for channel in BACKGROUND_RGB
 )  # morderngl takes each rgb chanel as a 0.0->1.0 so instead of changing config ill just live with this
-GLOBAL_LUMEN = 0.3
 TICKRATE = int(configuration["tickrate"])
 PEEP_MOVE_SPEED = float(configuration["peep_move_speed"])
 SHADERS_FOLDER_PATH = Path("./shaders")
@@ -84,7 +79,9 @@ def matrix_bytes(matrix) -> bytes:
 # of mesh due to technical debt + im tired.
 def upload_mesh(program, mesh):
     mesh.vbo = ctx.buffer(mesh.vertex_data.tobytes())
-    mesh.vao = ctx.vertex_array(program, [(mesh.vbo, "3f 3f", "in_position", "in_normal")])
+    mesh.vao = ctx.vertex_array(
+        program, [(mesh.vbo, "3f 3f", "in_position", "in_normal")]
+    )
     return mesh
 
 

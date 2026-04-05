@@ -1,4 +1,4 @@
-# PYGAME OR SDL2 (ILL CHOOSE LATER) HELPER FUNCTIONS AND STRUCTS
+# Stores some graphical objects
 
 import numpy as np
 import math as mth
@@ -146,17 +146,3 @@ class Camera:
         self.right = right
         self.up = up
         self.update_view()
-
-
-class Light:
-    def __init__(self, direction, position, intensity):
-        self.direction = direction
-        self.position = position
-        self.intensity = intensity
-
-
-def to_screen_space(clip_coord, width, height):
-    return (
-        int(round((clip_coord[0] + 1) / 2.0 * width, 0)),
-        int(round((1.0 - clip_coord[1]) / 2.0 * height, 0)),
-    )
