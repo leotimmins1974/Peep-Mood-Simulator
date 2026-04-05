@@ -44,6 +44,9 @@
 
     Formatting with Black
 
+    --------------------------
+
+    Okay I making a big change. software rendering on python is way too slow. Im getting 2 fps on a ryzen 7 7700. Im not sure if this violates the rules assignment, but ill be using moderngl's OpenGL python bindings and moving the per pixel math and per face math and per vertex math to a shader. This is pretty much nessersary at this point. previously I was using the painters algorithim which was fast enough, but having switched to z-depth rasturising, it is now way to slow.
 
 ### Refrences
 

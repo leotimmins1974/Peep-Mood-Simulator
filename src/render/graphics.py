@@ -3,7 +3,7 @@
 import numpy as np
 import math as mth
 
-WIDTH, HEIGHT = (1000, 600)
+WIDTH, HEIGHT = (500, 350)
 
 
 class Transform:
@@ -63,21 +63,11 @@ class Transform:
 
 
 class Mesh:
-    def __init__(self, verticies: [Vertex], faces: [Face]):
+    def __init__(self, vertex_data: [float]):
         self.transform = Transform()
         self.color = [200, 200, 200, 255]  # RGBA | Defaults to grey
-        self.verticies = verticies
-        self.faces = faces
-
-
-class Face:
-    def __init__(self, indicies: [float, float, float]):
-        self.indicies = indicies
-
-
-class Vertex:
-    def __init__(self, pos):
-        self.pos = pos
+        self.vertex_data = np.asarray(vertex_data, dtype="f4")
+        self.vertex_count = self.vertex_data.size // 3
 
 
 class Camera:

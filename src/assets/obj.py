@@ -1,15 +1,13 @@
 # MANAGER FOR .obj FILES
 
-import numpy as np
-
 import render.graphics as graphics
 
 
 def load(path) -> graphics.Mesh:
     data = open(path, "r").readlines()
 
-    verticies = []
-    faces = []
+    vertices = []
+    vertex_data = []
 
     for line in data:
         k = line.strip().split(" ", 1)
@@ -22,21 +20,27 @@ def load(path) -> graphics.Mesh:
                 pos = []
                 for p in k[1].split(" "):
                     pos.append(float(p))
-                verticies.append(graphics.Vertex(np.array(pos)))
+                vertices.append(pos)
 
             case "vt":
-                pass  # Maybe ill add UV textures at some point
+                pass
 
             case "vn":
-                pass  # Lighting once i get to it
+                pass
 
             case "f":
                 indicies = []
                 for i in k[1].split(" "):
                     indicies.append(
-                        int(i.split("/", 1)[0]) - 1
-                    )  # -1 to convert to 0 index
-                faces.append(graphics.Face(indicies))
+                        int(i.split("/", 1)[0]) - 1 # -1 to convert to 0
+                    )
+                for tri_index in range(1, len(indicies) - 1):
+                    for vertex_index in (
+                        indicies[0],
+                        indicies[tri_index],
+                        indicies[tri_index + 1],
+                    ):
+                        vertex_data.extend(vertices[vertex_index])
 
     print("done!")
-    return graphics.Mesh(verticies, faces)
+    return graphics.Mesh(vertex_data)
