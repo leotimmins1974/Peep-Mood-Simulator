@@ -3,7 +3,7 @@
 import numpy as np
 import math as mth
 
-WIDTH,HEIGHT = (600,500)
+WIDTH,HEIGHT = (1000,600)
 
 class Transform:
     def __init__(self):

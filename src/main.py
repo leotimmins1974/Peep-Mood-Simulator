@@ -11,9 +11,15 @@ import tools.results as results
 
 MESHES_FOLDER_PATH = "./meshes/"
 SIMULATION_CONFIG_PATH = "./simulation.config"
-TARGET_FPS = 60
+TARGET_FPS = 6000
 BACKGROUND_RGB = (15,15,30)
 GLOBAL_LUMEN = 0.3
+
+# Window/Buffer manager 
+pygame.init()
+pygame.display.set_caption("3D Peep Simulation")
+window = pygame.display.set_mode((graphics.WIDTH, graphics.HEIGHT))
+clock = pygame.time.Clock()
 
 # ENTRY POINT
 def main() -> exit_code:
@@ -29,13 +35,13 @@ def main() -> exit_code:
 
     church = obj.load(MESHES_FOLDER_PATH + "church.obj")
     church.color = (242,245,66) # Yellow
-    church.transform.translate = [-6,1,7]
-    church.transform.rotate = (0,1,0)
+    church.transform.translate = [-6,1,-7]
+    church.transform.rotate = (0,-1,0)
     church.transform.update_model()
 
     kfc = obj.load(MESHES_FOLDER_PATH + "kfc.obj")
     kfc.color = (242,50,66) # Red for KFC
-    kfc.transform.translate = [5,3.5,6]
+    kfc.transform.translate = [5.2,3.5,6]
     kfc.transform.scale = [3.,3.,3.]
     kfc.transform.rotate = (0,4.7,0)
     kfc.transform.update_model()
@@ -55,13 +61,6 @@ def main() -> exit_code:
     render_order = [test_peep,church ,floor_mesh,kfc]
     light_order = [cam_light, top_light]
 
-    # Window/Buffer manager 
-    pygame.init()
-    pygame.display.set_caption("3D Peep Simulation")
-
-    window = pygame.display.set_mode((graphics.WIDTH, graphics.HEIGHT))
-    clock = pygame.time.Clock()
-
     close = False
     while not close:
         # EVENT LOOP
@@ -70,6 +69,9 @@ def main() -> exit_code:
                 close = True
 
         window.fill(BACKGROUND_RGB)
+        render_text("fps: " + str(int(clock.get_fps())), (255,255,255), (5,5), size=18) # FPS counter
+        render_text(f"| Peep Mood Simulator | Leo Timmins | Student ID: 2559213 | COMP1005 | Simulation is in progress", (255,255,255), (70,5), size=18) # Sim title
+        render_text(f"Simulation Info | # RenObj: {len(render_order)} | #Lights: {len(light_order)} | ", (255,255,255), (5,32), size=13) # Sim title
         # SIM LOGIC
         
         # Draw Faces
@@ -84,6 +86,9 @@ def main() -> exit_code:
                     print(face.indicies)
                     continue
 
+
+                test_peep.transform.rotate[1] += 0.0001
+                test_peep.transform.update_model()
 
                 # Get relevent Vertex
                 v = (mesh.verticies[face.indicies[0]], mesh.verticies[face.indicies[1]], mesh.verticies[face.indicies[2]])
@@ -155,6 +160,12 @@ def main() -> exit_code:
     pygame.quit()
     return(0)
 
+# Helper function for rendering text with screen space coordinates
+# Will eventualy maybe have an option for world coordinates with rotation
+def render_text(string, rgb, xy, size=30, font_src="./assets/fonts/roboto_slab/RobotoSlab-Light.ttf"):
+    font = pygame.font.Font(font_src, size)
+    text = font.render(string, 1, pygame.Color(rgb))
+    window.blit(text, xy)
 
 exit_code = main()
 
