@@ -9,10 +9,16 @@ import render.graphics as graphics
 import tools.config as config
 import tools.results as results
 
-MESHES_FOLDER_PATH = "./meshes/"
+# Grab configs
 SIMULATION_CONFIG_PATH = "./simulation.config"
-TARGET_FPS = 6000
-BACKGROUND_RGB = (15,15,30)
+configuration = config.parse_config(SIMULATION_CONFIG_PATH)
+
+# Apply config
+MESHES_FOLDER_PATH = configuration['meshes_folder_path']
+TARGET_FPS = int(configuration['target_fps'])
+THREAD_USAGE = int(configuration['thread_usage'])
+B_RRGGBB = configuration['background_rgb']
+BACKGROUND_RGB = (int(B_RRGGBB[0:3]),int(B_RRGGBB[4:6]),int(B_RRGGBB[7:]))
 GLOBAL_LUMEN = 0.3
 
 # Window/Buffer manager 
@@ -23,9 +29,6 @@ clock = pygame.time.Clock()
 
 # ENTRY POINT
 def main() -> exit_code:
-
-    # Grab configs
-    configuration = config.parse_config(SIMULATION_CONFIG_PATH)
 
     # Load assets
     floor_mesh = obj.load(MESHES_FOLDER_PATH + "floor.obj")
@@ -71,7 +74,7 @@ def main() -> exit_code:
         window.fill(BACKGROUND_RGB)
         render_text("fps: " + str(int(clock.get_fps())), (255,255,255), (5,5), size=18) # FPS counter
         render_text(f"| Peep Mood Simulator | Leo Timmins | Student ID: 2559213 | COMP1005 | Simulation is in progress", (255,255,255), (70,5), size=18) # Sim title
-        render_text(f"Simulation Info | # RenObj: {len(render_order)} | #Lights: {len(light_order)} | ", (255,255,255), (5,32), size=13) # Sim title
+        render_text(f"Simulation Info | target_fps: {TARGET_FPS} | threads: {THREAD_USAGE} | RenObj: {len(render_order)} | Lights: {len(light_order)} | ", (255,255,255), (5,32), size=13) # Sim title
         # SIM LOGIC
         
         # Draw Faces

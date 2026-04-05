@@ -14,7 +14,7 @@ def parse_config(path):
         # Verification
         split_line = line.split("#", 1)[0].split('=')
         if len(split_line) == 2:
-            config[split_line[0]] = int(split_line[1]) # remove comments
+            config[split_line[0]] = str(split_line[1]) # remove comments
         else:
             print("--FORCE EXIT--")
             print("simulation.configuration is not properly configured: name = int")
