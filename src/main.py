@@ -9,6 +9,8 @@ import render.graphics as graphics
 import tools.config as config
 import tools.results as results
 
+import simulation.simulation as sim
+
 # Grab configs
 SIMULATION_CONFIG_PATH = "./simulation.config"
 configuration = config.parse_config(SIMULATION_CONFIG_PATH)
@@ -20,6 +22,8 @@ THREAD_USAGE = int(configuration['thread_usage'])
 B_RRGGBB = configuration['background_rgb']
 BACKGROUND_RGB = (int(B_RRGGBB[0:3]),int(B_RRGGBB[4:6]),int(B_RRGGBB[7:]))
 GLOBAL_LUMEN = 0.3
+TICKRATE = int(configuration["tickrate"])
+PEEP_MOVE_SPEED = float(configuration['peep_move_speed'])
 
 # Window/Buffer manager 
 pygame.init()
@@ -59,10 +63,21 @@ def main() -> exit_code:
     top_light = graphics.Light(np.array([0.,-1.,0.]), np.array([0.,5.,0.]), 0.1)
 
     test_peep = obj.load(MESHES_FOLDER_PATH + "peep.obj")
+    test_peep_manager = sim.Peep(test_peep) # Not sure how refrences work in python, im assuming this passes ref and not val?
     test_peep.color = (255,0,0)
+    test_peep_manager.move_speed = PEEP_MOVE_SPEED
+    test_peep_manager.move_to((5,0,0))
+    test_peep_manager.move_to((0,0,-8))
+    test_peep_manager.move_to((3,0,-8))
+    test_peep_manager.move_to((5,0,-5))
+    test_peep_manager.move_to((3,0,8))
 
     render_order = [test_peep,church ,floor_mesh,kfc]
     light_order = [cam_light, top_light]
+    peep_tick_order = [test_peep_manager]
+
+    # pygame.time.get_ticks -> time since init()
+    next_tick = pygame.time.get_ticks() + TICKRATE   # TIME OF FIRST TICK
 
     close = False
     while not close:
@@ -74,9 +89,18 @@ def main() -> exit_code:
         window.fill(BACKGROUND_RGB)
         render_text("fps: " + str(int(clock.get_fps())), (255,255,255), (5,5), size=18) # FPS counter
         render_text(f"| Peep Mood Simulator | Leo Timmins | Student ID: 2559213 | COMP1005 | Simulation is in progress", (255,255,255), (70,5), size=18) # Sim title
-        render_text(f"Simulation Info | target_fps: {TARGET_FPS} | threads: {THREAD_USAGE} | RenObj: {len(render_order)} | Lights: {len(light_order)} | ", (255,255,255), (5,32), size=13) # Sim title
-        # SIM LOGIC
+        render_text(f"Engine Info | target_fps: {TARGET_FPS} | tickrate: {TICKRATE} ms | threads: {THREAD_USAGE} | RenObj: {len(render_order)} | Lights: {len(light_order)} | ", (255,255,255), (5,32), size=13) # Sim title
         
+        # TICK LOGIC
+        ## ticks ever TICKRATE (ms) and doesnt tick on start
+        if pygame.time.get_ticks() >= next_tick:
+            #print("TICK !")
+            for p in peep_tick_order:
+                p.tick()
+            next_tick = pygame.time.get_ticks() + TICKRATE
+
+        # SIM LOGIC
+
         # Draw Faces
         view_proj = camera.projection @ camera.view
         triangles_to_draw = []
