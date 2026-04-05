@@ -16,6 +16,7 @@
 #   run "python3 src/main.py"
 
 import pygame
+import pygame.surfarray as surfarray
 import numpy as np
 import math as math
 
@@ -123,22 +124,7 @@ def main() -> exit_code:
             if event.type == pygame.QUIT:
                 close = True
         # Buffer setup
-        window.fill(BACKGROUND_RGB)
-        render_text(
-            "fps: " + str(int(clock.get_fps())), (255, 255, 255), (5, 5), size=18
-        )  # FPS counter
-        render_text(
-            f"| Peep Mood Simulator | Leo Timmins | Student ID: 2559213 | COMP1005 | Simulation is in progress",
-            (255, 255, 255),
-            (70, 5),
-            size=18,
-        )  # Sim title
-        render_text(
-            f"Engine Info | target_fps: {TARGET_FPS} | tickrate: {TICKRATE} ms | threads: {THREAD_USAGE} | RenObj: {len(render_order)} | Lights: {len(light_order)} | ",
-            (255, 255, 255),
-            (5, 32),
-            size=13,
-        )  # Sim title
+        #window.fill(BACKGROUND_RGB)
         # TICK LOGIC
         ## ticks ever TICKRATE (ms) and doesnt tick on start
         if pygame.time.get_ticks() >= next_tick:
@@ -222,11 +208,11 @@ def main() -> exit_code:
                     view_model @ np.append(v[1].pos, 1.0),
                     view_model @ np.append(v[2].pos, 1.0),
                 )
-                v = (
+                v = [
                     view_proj_model @ np.append(v[0].pos, 1.0),
                     view_proj_model @ np.append(v[1].pos, 1.0),
                     view_proj_model @ np.append(v[2].pos, 1.0),
-                )
+                ]
                 if any(vertex[3] <= 0 for vertex in v):
                     continue
 
@@ -235,7 +221,11 @@ def main() -> exit_code:
                     v[0][1] / v[0][3],
                     v[0][2] / v[0][3],
                 )  # FIX PERSPECTIVE WARP???
-                v[1] = (v[1][0] / v[1][3], v[1][1] / v[1][3], v[1][2] / v[1][3])
+                v[1] = (
+                    v[1][0] / v[1][3], 
+                    v[1][1] / v[1][3], 
+                    v[1][2] / v[1][3],
+                )
                 v[2] = (
                     v[2][0] / v[2][3],
                     v[2][1] / v[2][3],
@@ -255,22 +245,88 @@ def main() -> exit_code:
                 )
 
                 # Now for z-depth-buffer I need to iterate over each pixel
+                # Had to change to add screen bounds so i dont render off screen pixels
                 tri_bounds = (
-                    min(p[0][0], p[1][0], p[2][0]),
-                    max(p[0][0], p[1][0], p[2][0]),
-                    min(p[0][1], p[1][1], p[2][1]),
-                    max(p[0][1], p[1][1], p[2][1]),
+                    max(0, min(p[0][0], p[1][0], p[2][0])),
+                    min(graphics.WIDTH - 1, max(p[0][0], p[1][0], p[2][0])),
+                    max(0, min(p[0][1], p[1][1], p[2][1])),
+                    min(graphics.HEIGHT - 1, max(p[0][1], p[1][1], p[2][1])),
                 )  # x min max, y min max
 
                 # print(tri_bounds)
                 # Edge Function Formula
-                # Need to figure out that edge predicament first
+                # this was so stupid - painters worked well enough
+                
+                area = edge(p[0], p[1], p[2])
+                if area == 0:
+                    continue
+
+                inj_width = tri_bounds[1] - tri_bounds[0] + 1
+                inj_height = tri_bounds[3] - tri_bounds[2] + 1
+                
+                # Prev shading logic from painters
+                shaded_color = np.array(mesh.color[:3], dtype=float) * total_intensity
+                shaded_color = np.clip(shaded_color, 0, 255).astype(int)
+
+                for i in range(inj_width * inj_height):
+                    local_pixel = index_to_buffer_xy(i, inj_width, inj_height)
+                    pixel = (
+                        tri_bounds[0] + local_pixel[0],
+                        tri_bounds[2] + local_pixel[1],
+                    )
+                    e0 = edge(p[1], p[2], pixel)
+                    e1 = edge(p[2], p[0], pixel)
+                    e2 = edge(p[0], p[1], pixel)
+                    inside = (
+                        (e0 >= 0 and e1 >= 0 and e2 >= 0)
+                        or (e0 <= 0 and e1 <= 0 and e2 <= 0)
+                    )
+                    if not inside:
+                        continue
+
+                    # calc relevent color and depth for the buffer # since not adding textures yet / ever? i could probably get awaty with just a depth buffer
+                    # barycentric weighting: depth will be based on distance (En) from vertex (Vn)
+                    w0 = e0 / area
+                    w1 = e1 / area
+                    w2 = e2 / area
+                    p_depth = w0 * v[0][2] + w1 * v[1][2] + w2 * v[2][2]
+                    conv_big_index = xy_to_buffer_index(pixel, graphics.WIDTH, graphics.HEIGHT)
+                    prev_p_depth = depth_buffer[conv_big_index]
+                    if p_depth < prev_p_depth:
+                        rgb_buffer[conv_big_index] = shaded_color
+                        depth_buffer[conv_big_index] = p_depth
 
                 # Depreciated - painters algo
                 # shaded_color = np.array(mesh.color[:3], dtype=float) * total_intensity
                 # shaded_color = np.clip(shaded_color, 0, 255).astype(int)
                 # depth = (v_view[0][2] + v_view[1][2] + v_view[2][2]) / 3.0
                 # triangles_to_draw.append((depth, shaded_color, p))
+
+        # Continuation of z-depth
+        ## draw the buffer using a surface
+        buffer = np.array(rgb_buffer, dtype=np.uint8).reshape(
+            (graphics.HEIGHT, graphics.WIDTH, 3)
+        ).swapaxes(0, 1) # Row-major buffer needs axes swapped for surfarray
+        blit_surf = pygame.Surface((graphics.WIDTH, graphics.HEIGHT))
+        surfarray.blit_array(blit_surf, buffer)
+        window.blit(blit_surf, (0,0))
+
+        # Text at top of screen
+        render_text(
+            "fps: " + str(int(clock.get_fps())), (255, 255, 255), (5, 5), size=18
+        )  # FPS counter
+        render_text(
+            f"| Peep Mood Simulator | Leo Timmins | Student ID: 2559213 | COMP1005 | Simulation is in progress",
+            (255, 255, 255),
+            (70, 5),
+            size=18,
+        )  # Sim title
+        render_text(
+            f"Engine Info | target_fps: {TARGET_FPS} | tickrate: {TICKRATE} ms | threads: {THREAD_USAGE} | RenObj: {len(render_order)} | Lights: {len(light_order)} | ",
+            (255, 255, 255),
+            (5, 32),
+            size=13,
+        )  # Sim title
 
         # Draw Points
         # for mesh in render_order:
@@ -295,6 +351,19 @@ def render_text(
     text = font.render(string, 1, pygame.Color(rgb))
     window.blit(text, xy)
 
+# e > 0: Left of AB | e < 0: Right of AB
+def edge(a, b, p):
+    return (p[0] - a[0]) * (b[1] - a[1]) - (p[1] - a[1]) * (b[0] - a[0])
+
+# Given index for a buffer, and its dimentions, return xy pos
+def index_to_buffer_xy(index, b_width, b_height):
+    rows = index // b_width
+    index -= b_width * rows
+    return (index, rows) # Should be xy of a buffer
+
+# inverse of index_to_buffer_xy()
+def xy_to_buffer_index(xy, b_width, b_height):
+    return (xy[1] * b_width) + xy[0] # Should be index for a buffer
 
 exit_code = main()
 
