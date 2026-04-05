@@ -32,7 +32,9 @@ import tools.results as results
 import simulation.simulation as sim
 
 # Grab configs
-SIMULATION_CONFIG_PATH = "./simulation.config" # using path now. had an issue with using str
+SIMULATION_CONFIG_PATH = (
+    "./simulation.config"  # using path now. had an issue with using str
+)
 configuration = config.parse_config(SIMULATION_CONFIG_PATH)
 
 # Apply config
@@ -45,7 +47,9 @@ TARGET_FPS = int(configuration["target_fps"])
 THREAD_USAGE = int(configuration["thread_usage"])
 B_RRGGBB = configuration["background_rgb"]
 BACKGROUND_RGB = (int(B_RRGGBB[0:3]), int(B_RRGGBB[4:6]), int(B_RRGGBB[7:]))
-BACKGROUND_CLEAR = tuple(channel / 255.0 for channel in BACKGROUND_RGB) # morderngl takes each rgb chanel as a 0.0->1.0 so instead of changing config ill just live with this
+BACKGROUND_CLEAR = tuple(
+    channel / 255.0 for channel in BACKGROUND_RGB
+)  # morderngl takes each rgb chanel as a 0.0->1.0 so instead of changing config ill just live with this
 GLOBAL_LUMEN = 0.3
 TICKRATE = int(configuration["tickrate"])
 PEEP_MOVE_SPEED = float(configuration["peep_move_speed"])
@@ -54,29 +58,35 @@ SHADERS_FOLDER_PATH = Path("./shaders")
 # Init PyGame and ModernGL
 pygame.init()
 pygame.display.set_caption("3D Peep Simulation")
-window = pygame.display.set_mode((graphics.WIDTH, graphics.HEIGHT), pygame.OPENGL | pygame.DOUBLEBUF)
+window = pygame.display.set_mode(
+    (graphics.WIDTH, graphics.HEIGHT), pygame.OPENGL | pygame.DOUBLEBUF
+)
 ctx = moderngl.create_context()
 ctx.enable(moderngl.DEPTH_TEST)
 clock = pygame.time.Clock()
 
-# Read shaders and returns content as a str. technicaly not a shader specific function but 
-# i cant be bothered to port over all the other loading stuff to this. 
+
+# Read shaders and returns content as a str. technicaly not a shader specific function but
+# i cant be bothered to port over all the other loading stuff to this.
 def load_shader_source(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
 
 # Transpose it now as moderngl requires it in column-major which is stupid, had this same issue with glam
 # It also expects it as bytes obviously - this would be alot easier in rust. numpy is a real pain.
 def matrix_bytes(matrix) -> bytes:
     return np.asarray(matrix, dtype="f4").T.tobytes()
 
+
 # Creates the vertex buffer (VBO -> Vertex Buffer Objects) for the gpu
-# also creates the VAO -> Vertex Array Object. basicly telling the gpu which shaders to apply.
+# also creates the VAO -> Vertex Array Object. basicly defining the gpu package
 # in this case the vetrex & fragment shader. annoyingly I cant really make this a method
 # of mesh due to technical debt + im tired.
 def upload_mesh(program, mesh):
     mesh.vbo = ctx.buffer(mesh.vertex_data.tobytes())
-    mesh.vao = ctx.simple_vertex_array(program, mesh.vbo, "in_position")
+    mesh.vao = ctx.vertex_array(program, [(mesh.vbo, "3f 3f", "in_position", "in_normal")])
     return mesh
+
 
 # ENTRY POINT
 def main() -> exit_code:
@@ -114,9 +124,7 @@ def main() -> exit_code:
             CAMERA_XZ_DISTANCE * math.sin(camera_rotation),
         ]
     )
-    camera.look_at(
-        np.array([0.0, 0.0, 0.0])
-    ) # Looks at orgin
+    camera.look_at(np.array([0.0, 0.0, 0.0]))  # Looks at orgin
     camera.fov = CAMERA_FOV
     camera.update_projection()
 
@@ -141,10 +149,10 @@ def main() -> exit_code:
     ]
 
     # Uploads our projection matrix to the gpu
-    # Again: I should be doing this in the .update_projection() method 
+    # Again: I should be doing this in the .update_projection() method
     # but the technical debt makes it challenging
     program["projection"].write(matrix_bytes(camera.projection))
-    
+
     peep_tick_order = [test_peep_manager]
     next_tick = pygame.time.get_ticks() + TICKRATE  # TIME OF FIRST TICK
 
@@ -178,10 +186,12 @@ def main() -> exit_code:
 
         # RENDER LOOP - MODERNGL
         ctx.clear(*BACKGROUND_CLEAR)
-        
+
         for mesh in render_order:
             program["model"].write(matrix_bytes(mesh.transform.model))
-            program["color"].value = tuple(channel / 255.0 for channel in mesh.color[:3])
+            program["color"].value = tuple(
+                channel / 255.0 for channel in mesh.color[:3]
+            )
             mesh.vao.render(moderngl.TRIANGLES)
 
         # Cant use fonts anymore so im just gonna have to do it in the title
@@ -197,6 +207,7 @@ def main() -> exit_code:
     program.release()
     pygame.quit()
     return 0
+
 
 exit_code = main()
 

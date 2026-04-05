@@ -3,7 +3,7 @@
 import numpy as np
 import math as mth
 
-WIDTH, HEIGHT = (500, 350)
+WIDTH, HEIGHT = (1200, 800)
 
 
 class Transform:
@@ -149,10 +149,10 @@ class Camera:
 
 
 class Light:
-    def __init__(self, direction, position, lumens):
+    def __init__(self, direction, position, intensity):
         self.direction = direction
         self.position = position
-        self.lumens = lumens
+        self.intensity = intensity
 
 
 def to_screen_space(clip_coord, width, height):
