@@ -27,6 +27,7 @@
 #    - 2026-04-06 - readme update
 #    - 2026-04-06 - peeps rotate + misc
 #    - 2026-04-06 - color changes
+#    - 2026-04-06 - misc
 #
 # Usage:
 #   run "venv venv"
@@ -173,7 +174,7 @@ def main():
     floor_mesh.transform.scale = [4.0, 4.0, 4.0]
     floor_mesh.transform.translate = [0.0, -1.0, 0.0]
     floor_mesh.transform.update_model()
-    floor_mesh.color = (255,255,255)
+    floor_mesh.color = (255, 255, 255)
 
     church = obj.load(MESHES_FOLDER_PATH + "church.obj")
     church.color = (242, 245, 66)

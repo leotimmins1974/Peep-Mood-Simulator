@@ -679,20 +679,20 @@ class Peep:
             previous_position = list(self.position)
             self.position = self.movement_actions[0]
             self.movement_actions.pop(0)  # remove from queue
-            
+
             # Now look towards next move point if one exists.
             # This needs to be cleaned and refractored before release
             if len(self.movement_actions) != 0:
                 direciton = np.array(self.movement_actions[0]) - np.array(self.position)
                 norm = np.linalg.norm(direciton)
                 normalised = direciton / norm
-                #print(f"dbg {normalised_vec2}")
-                self.mesh.transform.rotate[1] = np.arctan2(normalised[0], normalised[2]) + math.tau/4
-                #print(f"dbg {np.arctan2(normalised[0], normalised[2])}")
+                # print(f"dbg {normalised_vec2}")
+                self.mesh.transform.rotate[1] = (
+                    np.arctan2(normalised[0], normalised[2]) + math.tau / 4
+                )
+                # print(f"dbg {np.arctan2(normalised[0], normalised[2])}")
 
             self.transfer_movement()  # updates the mesh
-
-             
 
         # Mood handling
         self.handle_arrival()
@@ -715,14 +715,14 @@ class Peep:
     # Update the mesh colour from the current mood band.
     def update_visuals(self):
         colors = {
-            "amazing": (38, 191, 0), # Darkish green 
-            "excited": (80, 255, 36), # Lime green
-            "happy": (180, 245, 164), # Green white
-            "content": (199, 255, 245), # Slight blue
-            "sad": (233, 255, 31), # Yellow
-            "irritated": (255, 200, 0), # Orange yellow
-            "angry": (255, 111, 0), # Red orange - BHP color
-            "fury": (255, 51, 0), # RED
+            "amazing": (38, 191, 0),  # Darkish green
+            "excited": (80, 255, 36),  # Lime green
+            "happy": (180, 245, 164),  # Green white
+            "content": (199, 255, 245),  # Slight blue
+            "sad": (233, 255, 31),  # Yellow
+            "irritated": (255, 200, 0),  # Orange yellow
+            "angry": (255, 111, 0),  # Red orange - BHP color
+            "fury": (255, 51, 0),  # RED
         }
         self.mesh.color = colors[self.mood_band()]
 

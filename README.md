@@ -24,7 +24,61 @@ python3 -m pip install -r requirements.txt
 
 - To view results go to /results.md (after running program and then closing it)
 
+### Marking Justifaction
+
+Here is an explaination of how each assesable feature is met:
+
+    Peeps
+
+    - Represented as objects. Yes. `src/simulation.py L345`
+    - Know their emotional state. Yes. `src/simulation.py L350..354`
+    - Able to move around the world. Yes. `src/simulation.py L677..694`
+    - Respond to events/interactions. Yes. `src/simulation.py L565..583`
+    - Differences in how they respond. Yes. `src/simulation.py L376..381`
+
+    Emotions
+
+    - Joy + atleast two more emotions. Yes. `src/simulation.py L399..416`
+    
+    Actors / Items / Events
+
+    - Actors can move and interact with peeps. Yes, God & Devil. `src/simulation.py L188..270`
+    - Items do not move ... can be part of events. Yes, Church & KFC. `src/simulation.py L488..520`
+    - Events are transient. Yes, 4 events can occur randomly. `src/simulation.py L283..343` 
+    
+    Interactions
+
+    - Mood changes when near others. Yes. `src/simulation.py L450..472`
+    - Check for interactions after moving. Yes. `src/simulation.py L697..703`
+
+    Plotting and Analysis
+
+    - Record metrics. Yes. `src/results.py`
+    - Plotting: 3D Realtime with OpenGL. `main.py`
+    
+    Flexability and Usability
+
+    - Input files to modify simulation. Yes. `simulation.config`
+
+    Comments and Readability
+
+    - Well documents
+
+    - Modularised application
+
+    - Formatted with Black (PEP8)
+
+    - While True / break / continue / globals. I think thats a silly rule, so I did not follow it. I used them where i felt they were nessesary.
+
+    Aditional Functionality
+
+    - 3D graphics pipeline
+
+    - High quality visualisation
+
 ### Notes
+
+Im not calling it emoSim.py or people.py. I dont want to.
 
 With the complexity of this program you may suspect AI usage. None was used. I have tracked my codebase with git so you can review the commits as proof if nessesary. Contact `23559213@student.curtin.edu.au` for the .git
 
