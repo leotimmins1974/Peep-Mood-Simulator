@@ -3,51 +3,61 @@
 
 ##  Leo Timmins | 23559213
 
-### Instructions
-
-    - To configure the simulation go to /simulation.config
-
-    - Be careful when modifying the config, read the comments
-
-    - To run program use `python3 src/main.py`
-
-    - To view results go to /results.md (after running (AND FINISHING) succesfully)
-
-    - If main() returns exit code !0 goto exit_report.txt // Not actualy implemented yet
-
-### Note
-    
-    With the complexity of this program you may suspect AI usage. None was used. I have tracked my codebase with git so you can review the commits as proof if nessesary.
 
 ### Dependancys
 
-    please run 
+please run 
 
-    ``` bash
-    python3 -m pip install -r requirements.txt
-    ```
+``` bash
+python3 -m pip install -r requirements.txt
+```
+
+### Instructions
+
+- Install dependancys (see `Dependancys` section)
+ 
+- To run program use `python3 ./main.py`
+
+- To configure the simulation go to /simulation.config
+
+- Be careful when modifying the config, read the comments
+
+- To view results go to /results.md (after running program and then closing it)
+
+### Notes
+
+With the complexity of this program you may suspect AI usage. None was used. I have tracked my codebase with git so you can review the commits as proof if nessesary. Contact `23559213@student.curtin.edu.au` for the .git
+
+I primarily program in Rust, and it has been some time since i've written a large Python project. As such, this project's structure will be familiar to those who know Rust. Modules are held within ./src/
+
+My original implementation of 3D rendering was single-threaded software rendering. After switching from painter's algorithim to a Z-buffering implementation, preformance had dropped from 60 fps to 3 fps on a ryzen 7 7700. As such I decided to remove my own rendering loop and replace it with OpenGL's vertex and fragment shaders which run on the GPU. FPS is practicaly unlimited now on a 5070ti. ModernGL is used as an API to OpenGL.
+
+My desision to use PyGame instead of ModernGL_Window was PyGames accesible APIs for input handling, and audio playback. I originaly intended to have music play based on the average mood of the Peeps. However I've lost intrest in this project.
+
+A consequence of using my own OpenGL context is PyGames font blitting feature no longer works so I've resorted to just using the window title bar as a text box.
+
+I prefer to use Markdown (.md) format for text documents, I recomend using a Markdown renderer to view the results file. However, due to the nature of Markdown, you can view it as plain text if you wish.
 
 ### Scope
 
-    The goal of my submission will be to use software rasturisation to create an interactive 3D simulation that can handle user input. I imagine there are likely Vulkan bindings for python, but I'd prefer to do it this way to increase code complexity and therefore get more marks.
+- Emotion Simulator: Simulates the mood of Peeps
 
-    I'll be storing models for the sim as simple .obj, made in blender.
+- Each Peep has 4 attributes (Social, Hunger, Wealth, Religion)
 
-    Peeps will have a content score derived from factors like "sociability, hunger, temperature, crazyness, religion"
-    Will change factors later to be based on actual psycological contentness
+- These attributes are weighted by the Peeps prefrences to calculate a mood
 
-    Events can happen that might apply multiplyers or remove peeps.
+- Moods influence behaviours and nearby peeps
 
-    Maybe ill add audio reflective of global mood, events, whatever.
+- Peeps can take differnet actions like eating, praying, socialising, attacking, or fleeing
 
-    Formatting with Black
+- Decisions are influenced by attribute levels, cooldowns, prefrences, and events
 
-    --------------------------
+- Events occur randomly and may include Actors (such as God, or the Devil)
 
-    Okay I making a big change. software rendering on python is way too slow. Im getting 2 fps on a ryzen 7 7700. Im not sure if this violates the rules assignment, but ill be using moderngl's OpenGL python bindings and moving the per pixel math and per face math and per vertex math to a shader. This is pretty much nessersary at this point. previously I was using the painters algorithim which was fast enough, but having switched to z-depth rasturising, it is now way to slow.
+- Simulation runs continously until the user closes the window
+
+- I've setup behaviours in such a way that peeps have a herd like mentality
 
 ### Refrences
 
-    - (Code I have written!) three-dimensional-rendering by Leo Timmins https://github.com/leotimmins1974/three-dimensional-rendering 
-    
-    - Transformation Matrix for Projection of 3d objects into a 2D plane (Projection Transform) https://www.mauriciopoppe.com/notes/computer-graphics/viewing/projection-transform/
+`Please refer to the report attached to this submition`

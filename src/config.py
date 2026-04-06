@@ -26,7 +26,7 @@ def parse_config(path):
             print(split_line)
             exit()
 
-    print(f"Loaded '{path}' -> {config}")
+    #print(f"Loaded '{path}' -> {config}") # Ill keep off in release, probably better to keep the console clean
     return config
 
 

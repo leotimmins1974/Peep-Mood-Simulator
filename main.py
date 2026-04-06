@@ -23,7 +23,8 @@
 #    - 2026-04-05 - ported to opengl
 #    - 2026-04-05 - shading
 #    - 2026-04-05 - project cleanup
-#    - 2026-04-05 - events, reporting, refractors, release cleanup
+#    - 2026-04-06 - events, reporting, refractors, release cleanup
+#    - 2026-04-06 - readme update
 #
 # Usage:
 #   run "venv venv"

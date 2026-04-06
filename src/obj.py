@@ -17,7 +17,8 @@ def load(path) -> graphics.Mesh:
 
         match parts[0]:
             case "o":
-                print(f"Loading .obj {parts[1]} .. ", end="")
+                #print(f"Loading .obj {parts[1]} .. ", end="")
+                pass
 
             case "v":
                 values = []
@@ -52,5 +53,5 @@ def load(path) -> graphics.Mesh:
                         vertex_data.extend(vertices[vertex_index])
                         vertex_data.extend(normals[normal_index])
 
-    print("done!")
+    #print("done!")
     return graphics.Mesh(vertex_data)
