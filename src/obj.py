@@ -1,59 +1,56 @@
-# MANAGER FOR .obj FILES
+# Simple OBJ loader for positions and normals.
 
-import render.graphics as graphics
+import src.graphics as graphics
 
 
+# Load a mesh from an OBJ file.
 def load(path) -> graphics.Mesh:
-    data = open(path, "r").readlines()
+    with open(path, "r", encoding="utf-8") as file:
+        data = file.readlines()
 
     vertices = []
     normals = []
     vertex_data = []
 
     for line in data:
-        k = line.strip().split(" ", 1)
+        parts = line.strip().split(" ", 1)
 
-        match k[0]:
-            # o Object Name
+        match parts[0]:
             case "o":
-                print(f"Loading .obj {k[1]} .. ", end="")
+                print(f"Loading .obj {parts[1]} .. ", end="")
 
-            # v Vertex Positions in Model Space
             case "v":
-                pos = []
-                for p in k[1].split():
-                    pos.append(float(p))
-                vertices.append(pos)
+                values = []
+                for value in parts[1].split():
+                    values.append(float(value))
+                vertices.append(values)
 
-            # vt Forgot what this represents lowkey
             case "vt":
                 pass
 
-            # vn Face Normal (already normalised THANKYOU BLENDER)
             case "vn":
-                pos = []
-                for p in k[1].split():
-                    pos.append(float(p))
-                normals.append(pos)
+                values = []
+                for value in parts[1].split():
+                    values.append(float(value))
+                normals.append(values)
 
             case "f":
                 face = []
-                for i in k[1].split():
-                    parts = i.split("/")
-                    vertex_index = int(parts[0]) - 1
-                    normal_index = int(parts[2]) - 1
+                for entry in parts[1].split():
+                    indices = entry.split("/")
+                    vertex_index = int(indices[0]) - 1
+                    normal_index = int(indices[2]) - 1
                     face.append((vertex_index, normal_index))
 
-                for tri_index in range(1, len(face) - 1):
+                # Renamed to f_index because its itering over 6 floats now.
+                for f_index in range(1, len(face) - 1):
                     for vertex_index, normal_index in (
                         face[0],
-                        face[tri_index],
-                        face[tri_index + 1],
+                        face[f_index],
+                        face[f_index + 1],
                     ):
                         vertex_data.extend(vertices[vertex_index])
-                        vertex_data.extend(
-                            normals[normal_index]
-                        )  # now 6 signed floats per pixel
+                        vertex_data.extend(normals[normal_index])
 
     print("done!")
     return graphics.Mesh(vertex_data)

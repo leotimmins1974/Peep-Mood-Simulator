@@ -1,24 +1,28 @@
-# READS 'simulation.config' AND RETURNS A HASHMAP
+# Read settings from `simulation.config`.
 
 
+# Parse the config file into a hashmap.
 def parse_config(path):
-    config_str = open(path, "r").read()
+    # Load file contents.
+    with open(path, "r", encoding="utf-8") as file:
+        config_str = file.read()
 
-    config_str = config_str.replace(" ", "")  # strip all white spaces
+    # Remove all spaces.
+    config_str = config_str.replace(" ", "")
 
-    # Remove comments and blank lines and headings
     config = {}
     for line in config_str.split("\n"):
+        # Remove headers, blanks, and comments
         if line == "" or line[0] == "[" or line[0] == "#":
-            continue  # strip all blank lines, lonely comments, and headings
+            continue
 
-        # Verification
         split_line = line.split("#", 1)[0].split("=")
         if len(split_line) == 2:
-            config[split_line[0]] = str(split_line[1])  # remove comments
+            config[split_line[0]] = str(split_line[1])
         else:
+            # Error handling incase someone messes up the configuration.
             print("--FORCE EXIT--")
-            print("simulation.configuration is not properly configured: name = int")
+            print("simulation.configuration is not properly configured: name = value")
             print(split_line)
             exit()
 
@@ -26,5 +30,6 @@ def parse_config(path):
     return config
 
 
+# Testing
 if __name__ == "__main__":
     parse_config("./simulation.config")

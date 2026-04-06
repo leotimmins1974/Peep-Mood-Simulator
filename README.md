@@ -5,11 +5,11 @@
 
 ### Instructions
 
-    - FOR main.py GO TO /src/main.py
-
-    - To configure simulation go to /simulation.config
+    - To configure the simulation go to /simulation.config
 
     - Be careful when modifying the config, read the comments
+
+    - To run program use `python3 src/main.py`
 
     - To view results go to /results.md (after running (AND FINISHING) succesfully)
 
@@ -29,8 +29,6 @@
 
 ### Scope
 
-    You'll Have to forgive the preformance of this program. Python, am I right? 
-    
     The goal of my submission will be to use software rasturisation to create an interactive 3D simulation that can handle user input. I imagine there are likely Vulkan bindings for python, but I'd prefer to do it this way to increase code complexity and therefore get more marks.
 
     I'll be storing models for the sim as simple .obj, made in blender.
