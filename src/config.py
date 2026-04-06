@@ -1,4 +1,4 @@
-# Read settings from `simulation.config`.
+# Read settings from a `.config` file.
 
 
 # Parse the config file into a hashmap.
@@ -18,7 +18,7 @@ def parse_config(path):
 
         split_line = line.split("#", 1)[0].split("=")
         if len(split_line) == 2:
-            config[split_line[0]] = str(split_line[1])
+            config[split_line[0]] = split_line[1]
         else:
             # Error handling incase someone messes up the configuration.
             print("--FORCE EXIT--")
@@ -26,7 +26,6 @@ def parse_config(path):
             print(split_line)
             exit()
 
-    #print(f"Loaded '{path}' -> {config}") # Ill keep off in release, probably better to keep the console clean
     return config
 
 

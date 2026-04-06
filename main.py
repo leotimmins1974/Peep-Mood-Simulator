@@ -25,6 +25,7 @@
 #    - 2026-04-05 - project cleanup
 #    - 2026-04-06 - events, reporting, refractors, release cleanup
 #    - 2026-04-06 - readme update
+#    - 2026-04-06 - peeps rotate + misc
 #
 # Usage:
 #   run "venv venv"
@@ -75,7 +76,7 @@ ctx.enable(moderngl.DEPTH_TEST)
 clock = pygame.time.Clock()
 
 
-# Read a shader from disk.
+# Read a shader from path.
 def load_shader_source(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
@@ -205,7 +206,7 @@ def main():
     camera.fov = CAMERA_FOV
     camera.update_projection()
 
-    # Upload the 'default' meshes first and add to render list.
+    # Upload the default meshes first and add to render list.
     render_order = [
         upload_mesh(program, church),
         upload_mesh(program, floor_mesh),
@@ -252,7 +253,7 @@ def main():
             tracker.record_tick(
                 peeps,
                 sim.current_event,
-                sim.average_hapiness(),
+                sim.average_happiness(),
             )
 
             # Offset next tick.
@@ -287,7 +288,7 @@ def main():
         pygame.display.set_caption(
             f"3D Peep Simulation"
             + f" | fps: {int(clock.get_fps())}"
-            + f" | avg hapiness: {sim.average_hapiness():.1f}"
+            + f" | avg happiness: {sim.average_happiness():.1f}"
             + f" | event: {sim.current_event}"
             + f" | {event_timer_text()}"
         )

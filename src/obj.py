@@ -1,4 +1,4 @@
-# Simple OBJ loader for positions and normals.
+# OBJ loader for positions and normals.
 
 import src.graphics as graphics
 
@@ -16,18 +16,11 @@ def load(path) -> graphics.Mesh:
         parts = line.strip().split(" ", 1)
 
         match parts[0]:
-            case "o":
-                #print(f"Loading .obj {parts[1]} .. ", end="")
-                pass
-
             case "v":
                 values = []
                 for value in parts[1].split():
                     values.append(float(value))
                 vertices.append(values)
-
-            case "vt":
-                pass
 
             case "vn":
                 values = []
@@ -53,5 +46,4 @@ def load(path) -> graphics.Mesh:
                         vertex_data.extend(vertices[vertex_index])
                         vertex_data.extend(normals[normal_index])
 
-    #print("done!")
     return graphics.Mesh(vertex_data)

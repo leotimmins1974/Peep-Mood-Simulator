@@ -162,6 +162,7 @@ def configure_world(
     spawn_radius=None,
     bound_box=None,
 ):
+    # Assment outline advices against globals but its sensible for this
     global CHURCH_POSITION, KFC_POSITION, PEEP_MOVE_SPEED, PEEP_SPAWN_RADIUS, PEEP_BOUND_BOX
 
     if church_position is not None:
@@ -269,7 +270,7 @@ class Actor:
 
 
 # Calculate the current average mood of all peeps.
-def average_hapiness():
+def average_happiness():
     if len(peeps) == 0:
         return 0.0
 
@@ -291,6 +292,10 @@ def start_event(name):
         event_actor = Actor(
             (255, 215, 0), "god", random_point_near(CHURCH_POSITION, 1.5)
         )
+        # Give everyone a bunch of money to fix that money issue
+        for peep in peeps:
+            peep.wealth = clamp(peep.wealth + 30.0)
+
     elif name == EVENT_DEVIL_RISEN:
         event_actor = Actor((220, 30, 30), "devil", random_wander_point())
     elif name == EVENT_PURGE:
@@ -421,7 +426,7 @@ class Peep:
                 nearby.append((other, distance))
         return nearby
 
-    # Apply the passive stat changes for one tick.
+    # Apply the passive stat changes and update timers for one tick.
     def apply_passive_changes(self):
         recovery = self.recovery_rate / 450.0
 
@@ -450,7 +455,6 @@ class Peep:
             other = peep_data[0]
             distance = peep_data[1]
             influence = 1.0 - (distance / MOOD_RADIUS)
-
 
             if band == "amazing":
                 other.social = clamp(other.social + (0.05 * influence))
@@ -675,7 +679,20 @@ class Peep:
             previous_position = list(self.position)
             self.position = self.movement_actions[0]
             self.movement_actions.pop(0)  # remove from queue
+            
+            # Now look towards next move point if one exists.
+            # This needs to be cleaned and refractored before release
+            if len(self.movement_actions) != 0:
+                direciton = np.array(self.movement_actions[0]) - np.array(self.position)
+                norm = np.linalg.norm(direciton)
+                normalised = direciton / norm
+                #print(f"dbg {normalised_vec2}")
+                self.mesh.transform.rotate[1] = np.arctan2(normalised[0], normalised[2]) + math.tau/4
+                #print(f"dbg {np.arctan2(normalised[0], normalised[2])}")
+
             self.transfer_movement()  # updates the mesh
+
+             
 
         # Mood handling
         self.handle_arrival()

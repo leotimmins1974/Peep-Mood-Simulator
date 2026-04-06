@@ -1,4 +1,4 @@
-# Write the final report files.
+# Manages runtime data and writes results.md
 
 from datetime import datetime
 from pathlib import Path
@@ -72,32 +72,32 @@ class SessionTracker:
 
         self.tick_count = 0
 
-        self.final_avg_hapiness = 0.0
-        self.avg_hapiness_total = 0.0
-        self.lowest_avg_hapiness = None
-        self.highest_avg_hapiness = None
+        self.final_avg_happiness = 0.0
+        self.avg_happiness_total = 0.0
+        self.lowest_avg_happiness = None
+        self.highest_avg_happiness = None
 
         self.event_counts = {}
         self.event_active_ticks = {}
         self.last_event = None
 
     # Record one simulation tick.
-    def record_tick(self, peeps, event_name, average_hapiness):
+    def record_tick(self, peeps, event_name, average_happiness):
         self.tick_count += 1
 
-        self.final_avg_hapiness = average_hapiness
-        self.avg_hapiness_total += average_hapiness
+        self.final_avg_happiness = average_happiness
+        self.avg_happiness_total += average_happiness
 
         if (
-            self.lowest_avg_hapiness is None
-            or average_hapiness < self.lowest_avg_hapiness
+            self.lowest_avg_happiness is None
+            or average_happiness < self.lowest_avg_happiness
         ):
-            self.lowest_avg_hapiness = average_hapiness
+            self.lowest_avg_happiness = average_happiness
         if (
-            self.highest_avg_hapiness is None
-            or average_hapiness > self.highest_avg_hapiness
+            self.highest_avg_happiness is None
+            or average_happiness > self.highest_avg_happiness
         ):
-            self.highest_avg_hapiness = average_hapiness
+            self.highest_avg_happiness = average_happiness
 
         if event_name not in self.event_active_ticks:
             self.event_active_ticks[event_name] = 0
@@ -113,11 +113,8 @@ class SessionTracker:
     # Write the final markdown results file.
     def write_results(self, peeps):
         end_time = datetime.now()
-        average_hapiness = average(self.avg_hapiness_total, self.tick_count)
+        average_happiness = average(self.avg_happiness_total, self.tick_count)
         runtime_seconds = (end_time - self.start_time).total_seconds()
-
-        lowest_avg_hapiness = self.lowest_avg_hapiness
-        highest_avg_hapiness = self.highest_avg_hapiness
 
         hunger_avg, hunger_min, hunger_max = get_stats(peeps, "hunger")
         social_avg, social_min, social_max = get_stats(peeps, "social")
@@ -137,10 +134,10 @@ class SessionTracker:
 
         lines.append("## Happiness")
         lines.append("")
-        lines.append(f"- Final Average Hapiness: `{self.final_avg_hapiness:.2f}`")
-        lines.append(f"- Session Average Hapiness: `{average_hapiness:.2f}`")
-        lines.append(f"- Lowest Average Hapiness: `{lowest_avg_hapiness:.2f}`")
-        lines.append(f"- Highest Average Hapiness: `{highest_avg_hapiness:.2f}`")
+        lines.append(f"- Final Average happiness: `{self.final_avg_happiness:.2f}`")
+        lines.append(f"- Session Average happiness: `{average_happiness:.2f}`")
+        lines.append(f"- Lowest Average happiness: `{self.lowest_avg_happiness:.2f}`")
+        lines.append(f"- Highest Average happiness: `{self.highest_avg_happiness:.2f}`")
         lines.append("")
 
         lines.append("## Final Attributes")
