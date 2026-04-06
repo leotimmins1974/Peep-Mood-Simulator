@@ -26,6 +26,7 @@
 #    - 2026-04-06 - events, reporting, refractors, release cleanup
 #    - 2026-04-06 - readme update
 #    - 2026-04-06 - peeps rotate + misc
+#    - 2026-04-06 - color changes
 #
 # Usage:
 #   run "venv venv"
@@ -56,7 +57,7 @@ CAMERA_FOV = float(configuration["camera_fov"])
 MESHES_FOLDER_PATH = configuration["meshes_folder_path"]
 TARGET_FPS = int(configuration["target_fps"])
 B_RRGGBB = configuration["background_rgb"]
-BACKGROUND_RGB = (int(B_RRGGBB[0:3]), int(B_RRGGBB[4:6]), int(B_RRGGBB[7:]))
+BACKGROUND_RGB = (int(B_RRGGBB[0:3]), int(B_RRGGBB[3:6]), int(B_RRGGBB[6:]))
 BACKGROUND_CLEAR = tuple(
     channel / 255.0 for channel in BACKGROUND_RGB
 )  # ModernGL expects each rgb channel in the 0.0 to 1.0 range.
@@ -172,6 +173,7 @@ def main():
     floor_mesh.transform.scale = [4.0, 4.0, 4.0]
     floor_mesh.transform.translate = [0.0, -1.0, 0.0]
     floor_mesh.transform.update_model()
+    floor_mesh.color = (255,255,255)
 
     church = obj.load(MESHES_FOLDER_PATH + "church.obj")
     church.color = (242, 245, 66)

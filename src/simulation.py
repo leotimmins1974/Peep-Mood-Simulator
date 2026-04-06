@@ -715,14 +715,14 @@ class Peep:
     # Update the mesh colour from the current mood band.
     def update_visuals(self):
         colors = {
-            "amazing": (110, 255, 140),
-            "excited": (220, 255, 90),
-            "happy": (69, 171, 10),
-            "content": (150, 170, 160),
-            "sad": (90, 140, 210),
-            "irritated": (220, 150, 60),
-            "angry": (220, 80, 60),
-            "fury": (120, 20, 20),
+            "amazing": (38, 191, 0), # Darkish green 
+            "excited": (80, 255, 36), # Lime green
+            "happy": (180, 245, 164), # Green white
+            "content": (199, 255, 245), # Slight blue
+            "sad": (233, 255, 31), # Yellow
+            "irritated": (255, 200, 0), # Orange yellow
+            "angry": (255, 111, 0), # Red orange - BHP color
+            "fury": (255, 51, 0), # RED
         }
         self.mesh.color = colors[self.mood_band()]
 
